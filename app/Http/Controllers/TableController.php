@@ -71,7 +71,7 @@ class TableController extends Controller
         $pageSize = $request->input('pageSize', 10);  
         $is_available = $request->input('is_available', null);
 
-        $query = Table::query();
+        $query = Table::query()->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id');
 
         if($is_available) {
             $query->where('is_available', $is_available == 'false' ? false : true);
