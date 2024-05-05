@@ -7,6 +7,7 @@ use App\Enums\Error\TableErrorCode;
 use App\Models\Table;
 use App\Models\SettingTable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
 {
@@ -71,13 +72,14 @@ class TableController extends Controller
         $pageSize = $request->input('pageSize', 10);  
         $is_available = $request->input('is_available', null);
 
-        $query = Table::query()->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id');
+        $query = DB::table('tables');
         if($is_available) {
             $is_available = ($is_available === 'false') ? false : true;
             $query->where('is_available', $is_available);
         }
-
-        $table_list = $query->paginate($pageSize, ['*'], 'page', $pageIndex);
+        $table_list = $query->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id')
+            ->select('tables.*', 'setting_table.price', 'setting_table.type')
+            ->paginate($pageSize, ['*'], 'page', $pageIndex);
      
         return response()->json([
             'message' => 'Successfully',
