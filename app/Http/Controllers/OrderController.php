@@ -63,4 +63,21 @@ class OrderController extends Controller
             'data' => $new_order
         ]);
     }
+
+    public function find_many(Request $request) {
+        $pageIndex = $request->input('pageIndex', 1); 
+        $pageSize = $request->input('pageSize', 10);  
+
+        $order_list = DB::table('orders')
+            ->join('tables', 'orders.table_id', '=', 'tables.id')
+            ->join('users', 'orders.user_id', '=', 'users.id')
+            ->select('orders.*', 'tables.name as tableName', 'users.name as employeeName')
+            ->paginate($pageSize, ['*'], 'page', $pageIndex);
+
+        return response()->json(
+            [
+                'message' => 'Successfully',
+                'data' => $order_list
+            ]);
+    }
 }

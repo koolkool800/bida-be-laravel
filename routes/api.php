@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function() {
 
     // ORDER
     ROUTE::prefix('orders')->group(function() {
+        Route::get('', [OrderController::class, 'find_many']);
         Route::post('check-in', [OrderController::class, 'check_in']);
         Route::post('check-out', [OrderController::class, 'check_out']);
     });
