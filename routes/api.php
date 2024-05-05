@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SettingTableController;
 use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
@@ -42,4 +43,10 @@ Route::prefix('v1')->group(function() {
         Route::get('', [EmployeeController::class, 'find_many']);
         Route::post('', [EmployeeController::class, 'create']);
     });  
+
+    // ORDER
+    ROUTE::prefix('orders')->group(function() {
+        Route::post('check-in', [OrderController::class, 'check_in']);
+        Route::post('check-out', [OrderController::class, 'check_out']);
+    });
 });

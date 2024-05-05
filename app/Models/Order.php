@@ -14,4 +14,15 @@ class Order extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
+
+    protected $fillable = [
+        'start_time',
+        'end_time',
+        'current_price',
+        'total_price',
+        'created_at',
+        'updated_at',
+        "table_id",
+        "user_id"
+    ];
 }

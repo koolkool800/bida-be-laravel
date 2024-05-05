@@ -72,13 +72,13 @@ class TableController extends Controller
         $is_available = $request->input('is_available', null);
 
         $query = Table::query()->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id');
-
         if($is_available) {
-            $query->where('is_available', $is_available == 'false' ? false : true);
+            $is_available = ($is_available === 'false') ? false : true;
+            $query->where('is_available', $is_available);
         }
 
         $table_list = $query->paginate($pageSize, ['*'], 'page', $pageIndex);
-        
+     
         return response()->json([
             'message' => 'Successfully',
             'data' => $table_list
