@@ -42,4 +42,18 @@ class EmployeeController extends Controller
             'data' => $new_user
         ]);
     }
+
+    public function find_many(Request $request) {
+        $pageIndex = $request->input('pageIndex', 1); 
+        $pageSize = $request->input('pageSize', 10);  
+
+        $user_list = User::where('role', UserRole::STAFF)
+            ->select('id', 'name', 'created_at', 'updated_at', 'user_name')
+            ->paginate($pageSize, ['*'], 'page', $pageIndex);
+ 
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => $user_list
+        ]);
+    }
 }

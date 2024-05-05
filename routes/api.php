@@ -39,5 +39,6 @@ Route::prefix('v1')->group(function() {
     // EMPLOYEE (WITH STAFF ROLE)
     Route::prefix('employees')->group(function() {
         Route::post('', [EmployeeController::class, 'create']);
+        Route::get('', [EmployeeController::class, 'find_many']);
     });  
 });

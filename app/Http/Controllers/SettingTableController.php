@@ -74,7 +74,6 @@ class SettingTableController extends Controller
         $pageIndex = $request->input('pageIndex', 1); 
         $pageSize = $request->input('pageSize', 10);    
         $setting_table_list = SettingTable::paginate($pageSize, ['*'], 'page', $pageIndex);
-        $total = SettingTable::count();
  
         return response()->json([
             'message' => 'Successfully',
