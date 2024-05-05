@@ -9,8 +9,8 @@ use BenSampo\Enum\Enum;
  * @method static static OptionTwo()
  * @method static static OptionThree()
  */
-final class TableErrorCode extends Enum
+final class UserErrorCode extends Enum
 {
-    const TABLE_ALREADY_EXIST = 'TABLE_001'; 
-    const TABLE_NOT_FOUND = 'TABLE_002';
+    const USER_ALREADY_EXIST = 'USER_001'; 
+    const USER_NOT_FOUND = 'USER_002';
 }

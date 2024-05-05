@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             // SET FOREIGN
-            $table->foreign('setting_table_id')->references('id')->on('setting_table')->onDelete('CASCADE');
+            $table->foreign('setting_table_id')->references('id')->on('setting_table')->onDelete('RESTRICT');
         });
     }
 

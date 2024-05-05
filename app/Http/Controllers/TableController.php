@@ -46,4 +46,23 @@ class TableController extends Controller
             'data' => $newTable
         ]);
     }
+
+    public function delete(Request $request, $id) {
+        $table = Table::where('id', $id)->first();
+        if(!$table) {
+            return response()->json(
+                [
+                    'error_code' =>  TableErrorCode::TABLE_NOT_FOUND, 
+                    'message' => 'Table not found'
+                ], 400); 
+        }
+
+        $table->delete();
+        
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => 1
+        ]);
+
+    }
 }

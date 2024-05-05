@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SettingTableController;
 use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,7 @@ Route::prefix('v1')->group(function() {
     // TABLES
     Route::prefix('tables')->group(function() {
         Route::post('', [TableController::class, 'create']);
+        Route::delete('/{id}', [TableController::class, 'delete']);
     });
 
     // SETTING TABLE
@@ -32,4 +34,9 @@ Route::prefix('v1')->group(function() {
         Route::post('', [SettingTableController::class, 'create']);
         Route::patch('/{id}', [SettingTableController::class, 'update']);
     });
+
+    // EMPLOYEE (WITH STAFF ROLE)
+    Route::prefix('employees')->group(function() {
+        Route::post('', [EmployeeController::class, 'create']);
+    });  
 });
