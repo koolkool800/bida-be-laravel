@@ -25,20 +25,21 @@ Route::prefix('v1')->group(function() {
 
     // TABLES
     Route::prefix('tables')->group(function() {
+        Route::get('', [TableController::class, 'find_many']);
         Route::post('', [TableController::class, 'create']);
         Route::delete('/{id}', [TableController::class, 'delete']);
     });
 
     // SETTING TABLE
     Route::prefix('setting-table')->group(function() {
+        Route::get('', [SettingTableController::class, 'find_many']);
         Route::post('', [SettingTableController::class, 'create']);
         Route::patch('/{id}', [SettingTableController::class, 'update']);
-        Route::get('', [SettingTableController::class, 'find_many']);
     });
 
     // EMPLOYEE (WITH STAFF ROLE)
     Route::prefix('employees')->group(function() {
-        Route::post('', [EmployeeController::class, 'create']);
         Route::get('', [EmployeeController::class, 'find_many']);
+        Route::post('', [EmployeeController::class, 'create']);
     });  
 });

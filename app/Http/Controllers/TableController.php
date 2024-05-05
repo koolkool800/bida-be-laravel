@@ -65,4 +65,23 @@ class TableController extends Controller
         ]);
 
     }
+
+    public function find_many(Request $request) {
+        $pageIndex = $request->input('pageIndex', 1); 
+        $pageSize = $request->input('pageSize', 10);  
+        $is_available = $request->input('is_available', null);
+
+        $query = Table::query();
+
+        if($is_available) {
+            $query->where('is_available', $is_available == 'false' ? false : true);
+        }
+
+        $table_list = $query->paginate($pageSize, ['*'], 'page', $pageIndex);
+        
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => $table_list
+        ]);
+    }
 }
