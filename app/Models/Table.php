@@ -13,4 +13,12 @@ class Table extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
+
+    protected $fillable = [
+        'name',
+        'is_available',
+        'setting_table_id',
+        'created_at',
+        'updated_at',
+    ];
 }
