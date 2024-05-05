@@ -14,4 +14,5 @@ final class TableErrorCode extends Enum
     const TABLE_ALREADY_EXIST = 'TABLE_001'; 
     const TABLE_NOT_FOUND = 'TABLE_002';
     const TABLE_NOT_AVAILABLE = 'TABLE_003';
+    const TABLE_AVAILABLE = 'TABLE_004';
 }
