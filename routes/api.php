@@ -30,6 +30,6 @@ Route::prefix('v1')->group(function() {
     // SETTING TABLE
     Route::prefix('setting-table')->group(function() {
         Route::post('', [SettingTableController::class, 'create']);
-        Route::patch('', [SettingTableController::class, 'update']);
+        Route::patch('/{id}', [SettingTableController::class, 'update']);
     });
 });
