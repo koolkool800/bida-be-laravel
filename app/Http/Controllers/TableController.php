@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Error\SettingTableErrorCode;
+use App\Enums\Error\TableErrorCode;
 use App\Models\Table;
 use App\Models\SettingTable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TableController extends Controller
 {
@@ -19,7 +20,7 @@ class TableController extends Controller
         if(!$is_exist_setting_table_id) {
             return response()->json(
                 [
-                    'error_code' =>  'SETTING_TABLE_001', 
+                    'error_code' =>  SettingTableErrorCode::SETTING_TABLE_NOT_FOUND, 
                     'message' => 'Setting table not found'
                 ], 400); 
         }
@@ -28,7 +29,7 @@ class TableController extends Controller
         if($is_exist_table_name) {
             return response()->json(
                 [
-                    'error_code' =>  'TABLE_002', 
+                    'error_code' =>  TableErrorCode::TABLE_ALREADY_EXIST, 
                     'message' => 'Table name already exist'
                 ], 400); 
         }
@@ -38,9 +39,8 @@ class TableController extends Controller
             "is_available" => true,
             "setting_table_id" => $setting_table_id
         ];
-
         $newTable = Table::create($insertTable);
-
+        
         return response()->json([
             'message' => 'Successfully',
             'data' => $newTable

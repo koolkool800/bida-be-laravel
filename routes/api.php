@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SettingTableController;
 use App\Http\Controllers\TableController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,7 +22,14 @@ Route::prefix('v1')->group(function() {
         Route::post('login', [AuthController::class, 'login']);
     });
 
+    // TABLES
     Route::prefix('tables')->group(function() {
         Route::post('', [TableController::class, 'create']);
+    });
+
+    // SETTING TABLE
+    Route::prefix('setting-table')->group(function() {
+        Route::post('', [SettingTableController::class, 'create']);
+        Route::patch('', [SettingTableController::class, 'update']);
     });
 });

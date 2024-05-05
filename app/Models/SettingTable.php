@@ -13,4 +13,11 @@ class SettingTable extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = true;
+
+    protected $fillable = [
+        'type',
+        'price',
+        'created_at',
+        'updated_at',
+    ];
 }
