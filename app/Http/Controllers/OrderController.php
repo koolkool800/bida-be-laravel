@@ -67,46 +67,45 @@ class OrderController extends Controller
     }
 
     public function check_out(Request $request) {
-        // $order_id = $request->input('order_id');
-        // // TODO: validation
+        $order_id = $request->input('order_id');
+        // TODO: validation
 
-        // $order = Order::where('id', $order_id)->first();
-        // if(!$order) {
-        //     return response()->json(
-        //         [
-        //             'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
-        //             'message' => 'Order not found'
-        //         ], 400); 
-        // }
+        $order = Order::where('id', $order_id)->first();
+        if(!$order) {
+            return response()->json(
+                [
+                    'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
+                    'message' => 'Order not found'
+                ], 400); 
+        }
 
-        // if($order->end_time) {
-        //     return response()->json(
-        //         [
-        //             'error_code' =>  OrderErrorCode::ORDER_ALREADY_CHECK_OUT, 
-        //             'message' => 'Order already checkout'
-        //         ], 400); 
-        // }
+        if($order->end_time) {
+            return response()->json(
+                [
+                    'error_code' =>  OrderErrorCode::ORDER_ALREADY_CHECK_OUT, 
+                    'message' => 'Order already checkout'
+                ], 400); 
+        }
        
+        $time_diff = Carbon::now()->diff($order->start_time);
+        $total_hours = $time_diff->days * 24 + $time_diff->h + $time_diff->i / 60 + $time_diff->s / 3600;
+        $total_price = $total_hours * $order->current_price;
+       
+        $updateOrder = [
+            "end_time" => Carbon::now(),
+            "total_price" => intval(round($total_price)),
+        ];
+        DB::table('orders')->where('id', $order_id)->update($updateOrder);
 
-        // $insertOrder = [
-        //     "start_time" => Carbon::now(),
-        //     "end_time" => null,
-        //     "current_price" => $table->price,
-        //     "total_price" => null,
-        //     "table_id" => $table_id,
-        //     "user_id" => $user_id
-        // ];
-        // $new_order = Order::create($insertOrder);
+        $updateTable = [
+            "is_available" => true
+        ];
+        DB::table('tables')->where('id', $order->table_id)->update($updateTable);
 
-        // $updateTable = [
-        //     "is_available" => false
-        // ];
-        // DB::table('tables')->where('id', $$order->table_id)->update($updateTable);
-
-        // return response()->json([
-        //     'message' => 'Successfully',
-        //     'data' => $new_order
-        // ]);
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => 1
+        ]);
     }
 
     public function find_many(Request $request) {
