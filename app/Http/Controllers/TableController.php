@@ -11,20 +11,32 @@ class TableController extends Controller
 {
     public function create(Request $request)
     {
-        $is_exist_setting_table_id = SettingTable::where('id', $request->input("setting_table_id"))->first();
+        $name = $request->input("name");
+        $setting_table_id = $request->input("setting_table_id");
+        // TODO: validation
+
+        $is_exist_setting_table_id = SettingTable::where('id', $setting_table_id)->first();
         if(!$is_exist_setting_table_id) {
             return response()->json(
                 [
                     'error_code' =>  'SETTING_TABLE_001', 
-                    'error' => 'Unauthorized', 
                     'message' => 'Setting table not found'
                 ], 400); 
         }
 
+        $is_exist_table_name = Table::where('name', $name)->first();
+        if($is_exist_table_name) {
+            return response()->json(
+                [
+                    'error_code' =>  'TABLE_002', 
+                    'message' => 'Table name already exist'
+                ], 400); 
+        }
+
         $insertTable = [
-            "name" => $request->input("name"),
+            "name" => $name,
             "is_available" => true,
-            "setting_table_id" => $request->input("setting_table_id")
+            "setting_table_id" => $setting_table_id
         ];
 
         $newTable = Table::create($insertTable);
