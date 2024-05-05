@@ -69,4 +69,16 @@ class SettingTableController extends Controller
                 ], 400); 
         }
     }
+
+    public function find_many(Request $request) {
+        $pageIndex = $request->input('pageIndex', 1); 
+        $pageSize = $request->input('pageSize', 10);    
+        $setting_table_list = SettingTable::paginate($pageSize, ['*'], 'page', $pageIndex);
+        $total = SettingTable::count();
+ 
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => $setting_table_list
+        ]);
+    }
 }

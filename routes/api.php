@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function() {
     Route::prefix('setting-table')->group(function() {
         Route::post('', [SettingTableController::class, 'create']);
         Route::patch('/{id}', [SettingTableController::class, 'update']);
+        Route::get('', [SettingTableController::class, 'find_many']);
     });
 
     // EMPLOYEE (WITH STAFF ROLE)
