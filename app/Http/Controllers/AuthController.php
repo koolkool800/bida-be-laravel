@@ -43,7 +43,8 @@ class AuthController extends Controller
                 'token_type' => 'jwt',
                 'expires_in' => auth()->factory()->getTTL() * 60,
                 'role' => $user->role,
-                'name' => $user->name
+                'name' => $user->name,
+                'id' => $user->id
             ]
         ], 200);
     }

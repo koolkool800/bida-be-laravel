@@ -71,11 +71,15 @@ class TableController extends Controller
         $pageIndex = $request->input('pageIndex', 1); 
         $pageSize = $request->input('pageSize', 10);  
         $is_available = $request->input('is_available', null);
+        $q = $request->input('q', null);
 
         $query = DB::table('tables');
         if($is_available) {
             $is_available = ($is_available === 'false') ? false : true;
-            $query->where('is_available', $is_available);
+            $query->where('tables.is_available', $is_available);
+        }
+        if($q) {
+            $query->where('tables.name', 'LIKE', '%' . $q . '%');
         }
         $table_list = $query->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id')
             ->select('tables.*', 'setting_table.price', 'setting_table.type')
