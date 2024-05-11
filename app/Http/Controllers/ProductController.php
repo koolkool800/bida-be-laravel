@@ -58,7 +58,7 @@ class ProductController extends Controller
         if($q) {
             $query->where('san_pham.ten_san_pham', 'LIKE', '%' . $q . '%');
         }
-        $product_list = $query->select('san_pham.id as id', 'san_pham.ten_san_pham as name', 'san_pham.loai_san_pham as type', 'san_pham.gia_san_pham as price', 'san_pham.thoi_gian_tao as created_at')
+        $product_list = $query->select('san_pham.id as id', 'san_pham.ten_san_pham as name', 'san_pham.loai_san_pham as type', 'san_pham.gia_san_pham as price', 'san_pham.thoi_gian_tao as created_at', 'san_pham.hinh_anh_url as image_url')
             ->orderBy('san_pham.thoi_gian_tao', 'DESC') 
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
      
