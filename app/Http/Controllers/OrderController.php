@@ -7,6 +7,7 @@ use App\Enums\Error\TableErrorCode;
 use App\Enums\Error\UserErrorCode;
 use App\Models\Table;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -246,8 +247,27 @@ class OrderController extends Controller
         return intval(round($total_price));
     }
 
-    private function find_one(Request $request, $order_id) {
-        $order = Order::where('id', $order_id)->first();
+    public function find_one(Request $request, $order_id) {
+        $order = Order::where('orders.id', $order_id)
+        ->join('tables', 'orders.table_id', '=', 'tables.id')
+        ->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id')
+        ->select(
+            'orders.id as id',
+            'orders.start_time as start_time',
+            'orders.end_time as end_time',
+            'orders.current_price as current_price',
+            'orders.total_price as total_price',
+            'orders.created_at as created_at',
+            'orders.updated_at as updated_at',
+            "orders.table_id as table_id",
+            "orders.user_id as user_id",
+            'orders.tong_gia_san_pham as total_product_price',
+
+            'tables.name as table_name',
+            'setting_table.type as setting_table_type',
+        )
+        ->first();
+        
         if(!$order) {
             return response()->json(
                 [
@@ -255,5 +275,25 @@ class OrderController extends Controller
                     'message' => 'Đơn hàng này không tìm thấy'
                 ], 400); 
         }
+        $order_detail = OrderDetail::where('don_hang_chi_tiet.don_hang_id', $order_id)
+        ->join('san_pham', 'san_pham.id', '=', 'don_hang_chi_tiet.san_pham_id')
+        ->select(
+            'san_pham.hinh_anh_url as image_url',
+            'san_pham.ten_san_pham as product_name',
+            'san_pham.loai_san_pham as product_type',
+
+            'don_hang_chi_tiet.gia_san_pham as product_price',
+            'don_hang_chi_tiet.thoi_gian_tao as created_at',
+            'don_hang_chi_tiet.so_luong_san_pham as quantity'
+        )
+        ->get();
+
+        $order->order_detail = $order_detail;
+ 
+        return response()->json(
+            [
+                'message' => 'Successfully',
+                'data' => $order
+            ]);
     }
 }
