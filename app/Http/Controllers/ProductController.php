@@ -47,16 +47,15 @@ class ProductController extends Controller
 
     public function find_many(Request $request) {
         $pageIndex = $request->input('pageIndex', 1); 
-        $pageSize = $request->input('pageSize', 10);  
-        $q = $request->input('q', null);
-        $type = $request->input('type');
+        $pageSize = $request->input('pageSize', 10);
+        $q = $request->input('type', null);  
+        $type = $request->input('type', null);  
 
         if(!$pageIndex) $pageIndex = 1;
         if(!$pageSize) $pageSize = 10;
         
 
         $query = DB::table('san_pham');
-        
         if($q) {
             $query->where('san_pham.ten_san_pham', 'LIKE', '%' . $q . '%');
         }
