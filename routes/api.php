@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingTableController;
 use App\Http\Controllers\TableController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,5 +60,10 @@ Route::prefix('v1')->group(function() {
         Route::get('', [ProductController::class, 'find_many']);
         Route::delete('/{id}', [ProductController::class, 'delete']);
         // Route::post('check-out', [OrderController::class, 'check_out']);
+    });
+
+    // FILE
+    ROUTE::prefix('file')->group(function() {
+        Route::post('', [FileController::class, 'uploadFile']);
     });
 });
