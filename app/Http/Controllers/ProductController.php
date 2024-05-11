@@ -48,7 +48,7 @@ class ProductController extends Controller
     public function find_many(Request $request) {
         $pageIndex = $request->input('pageIndex', 1); 
         $pageSize = $request->input('pageSize', 10);
-        $q = $request->input('type', null);  
+        $q = $request->input('q', null);  
         $type = $request->input('type', null);  
 
         if(!$pageIndex) $pageIndex = 1;
