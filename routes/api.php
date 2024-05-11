@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingTableController;
 use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
@@ -49,5 +50,13 @@ Route::prefix('v1')->group(function() {
         Route::get('', [OrderController::class, 'find_many']);
         Route::post('check-in', [OrderController::class, 'check_in']);
         Route::post('check-out', [OrderController::class, 'check_out']);
+    });
+
+    // PRODUCT
+    ROUTE::prefix('products')->group(function() {
+        Route::post('', [ProductController::class, 'create']);
+        Route::get('', [ProductController::class, 'find_many']);
+        Route::delete('/{id}', [ProductController::class, 'delete']);
+        // Route::post('check-out', [OrderController::class, 'check_out']);
     });
 });

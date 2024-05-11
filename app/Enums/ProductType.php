@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Enums\Error;
+namespace App\Enums;
 
 use BenSampo\Enum\Enum;
 
@@ -9,8 +9,8 @@ use BenSampo\Enum\Enum;
  * @method static static OptionTwo()
  * @method static static OptionThree()
  */
-final class OrderErrorCode extends Enum
+final class ProductType extends Enum
 {
-    const ORDER_NOT_FOUND = 'ORDER_001'; 
-    const ORDER_ALREADY_CHECK_OUT = 'ORDER_003'; 
+    const FOOD = 'FOOD';
+    const DRINK = 'DRINK';
 }

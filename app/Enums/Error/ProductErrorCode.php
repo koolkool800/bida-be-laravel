@@ -9,8 +9,8 @@ use BenSampo\Enum\Enum;
  * @method static static OptionTwo()
  * @method static static OptionThree()
  */
-final class OrderErrorCode extends Enum
+final class ProductErrorCode extends Enum
 {
-    const ORDER_NOT_FOUND = 'ORDER_001'; 
-    const ORDER_ALREADY_CHECK_OUT = 'ORDER_003'; 
+    const PRODUCT_NOT_FOUND = 'PRODUCT_001'; 
+    const PRODUCT_ALREADY_EXIST = 'PRODUCT_003'; 
 }
