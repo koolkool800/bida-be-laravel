@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -123,5 +124,58 @@ class OrderController extends Controller
                 'message' => 'Successfully',
                 'data' => $order_list
             ]);
+    }
+
+    public function add_product_into_order(Request $request, $order_id) {
+        try {
+            $products = $request->input('products', null);
+            
+            if(!$products) {
+                return response()->json([
+                    'message' => 'Vui lòng thêm sản phẩm',
+                    'data' => null
+                ]);  
+            }
+
+            $order = Order::where('id', $order_id)->first();
+            if(!$order) {
+                return response()->json(
+                    [
+                        'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
+                        'message' => 'Đơn hàng này không tìm thấy'
+                    ], 400); 
+            }
+            if($order->end_time) {
+                return response()->json(
+                    [
+                        'error_code' =>  OrderErrorCode::ORDER_ALREADY_CHECK_OUT, 
+                        'message' => 'Đơn hàng này đã thanh toán'
+                    ], 400); 
+            }
+
+            $insert_order_detail = [];
+
+            foreach($products as $product) {
+                array_push($insert_order_detail, [
+                    "so_luong_san_pham" => $product['quantity'],
+                    "gia_san_pham" => $product['price'],
+                    "don_hang_id" => $order_id,
+                    "san_pham_id" => $product['product_id']
+                ]); 
+            }
+            DB::table('don_hang_chi_tiet')->insert($insert_order_detail);
+
+            return response()->json([
+                'message' => 'Thêm thành công',
+                'data' => 1
+            ]);
+        } catch(QueryException $e) {
+            print_r($e);
+            return response()->json(
+                [ 
+                    'message' => 'Vui lòng kiểm tra lại sản phẩm'
+                ], 
+                400); 
+        }
     }
 }

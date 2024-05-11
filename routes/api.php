@@ -52,6 +52,7 @@ Route::prefix('v1')->group(function() {
         Route::get('', [OrderController::class, 'find_many']);
         Route::post('check-in', [OrderController::class, 'check_in']);
         Route::post('check-out', [OrderController::class, 'check_out']);
+        Route::post('/{order_id}/products', [OrderController::class, 'add_product_into_order']);
     });
 
     // PRODUCT
