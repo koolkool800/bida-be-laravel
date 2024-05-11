@@ -88,13 +88,16 @@ class OrderController extends Controller
                 ], 400); 
         }
        
-        $time_diff = Carbon::now()->diff($order->start_time);
-        $total_hours = $time_diff->days * 24 + $time_diff->h + $time_diff->i / 60 + $time_diff->s / 3600;
-        $total_price = $total_hours * $order->current_price;
-       
+        // $time_diff = Carbon::now()->diff($order->start_time);
+        // $total_hours = $time_diff->days * 24 + $time_diff->h + $time_diff->i / 60 + $time_diff->s / 3600;
+        // $total_price = $total_hours * $order->current_price;
+
+        $total_price_by_start_time_and_end_time = $this->calc_total_price_by_start_time_and_end_time($order->current_price, $order->start_time, Carbon::now());
+        $total_price = $total_price_by_start_time_and_end_time + $order->tong_gia_san_pham;
+
         $updateOrder = [
             "end_time" => Carbon::now(),
-            "total_price" => intval(round($total_price)),
+            "total_price" => $total_price,
         ];
         DB::table('orders')->where('id', $order_id)->update($updateOrder);
 
@@ -111,12 +114,38 @@ class OrderController extends Controller
 
     public function find_many(Request $request) {
         $pageIndex = $request->input('pageIndex', 1); 
-        $pageSize = $request->input('pageSize', 10);  
+        $pageSize = $request->input('pageSize', 10); 
+        $has_checkout = $request->input('has_checkout', null); 
 
-        $order_list = DB::table('orders')
+        $query = DB::table('orders');
+
+        if($has_checkout) {
+            $has_checkout = ($has_checkout === 'false') ? false : true;
+            if($has_checkout) {
+                $query->whereNotNull('orders.end_time');
+            } else {
+                $query->whereNull('orders.end_time');
+            }
+        }
+
+        $order_list = $query
             ->join('tables', 'orders.table_id', '=', 'tables.id')
             ->join('users', 'orders.user_id', '=', 'users.id')
-            ->select('orders.*', 'tables.name as tableName', 'users.name as employeeName')
+            ->select(
+                'orders.id as id',
+                'orders.start_time as start_time',
+                'orders.end_time as end_time',
+                'orders.current_price as current_price',
+                'orders.total_price as total_price',
+                'orders.created_at as created_at',
+                'orders.updated_at as updated_at',
+                "orders.table_id as table_id",
+                "orders.user_id as user_id",
+                'orders.tong_gia_san_pham as total_product_price',
+
+                'tables.name as tableName', 
+                'users.name as employeeName'
+                )
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
 
         return response()->json(
@@ -192,8 +221,13 @@ class OrderController extends Controller
                 ], 400); 
         }
 
-        $total_price_by_start_time_and_end_time = $this->calc_total_price_by_start_time_and_end_time($order->current_price, $order->start_time, Carbon::now());
-        $total_price = $total_price_by_start_time_and_end_time + $order->tong_gia_san_pham;
+        $total_price;
+        if($order->end_time) {
+            $total_price = $order->total_price;
+        } else {
+            $total_price_by_start_time_and_end_time = $this->calc_total_price_by_start_time_and_end_time($order->current_price, $order->start_time, Carbon::now());
+            $total_price = $total_price_by_start_time_and_end_time + $order->tong_gia_san_pham;
+        }
 
         return response()->json([
             'message' => 'Successfully',
@@ -210,5 +244,16 @@ class OrderController extends Controller
         $total_price = $total_hours * $price;
 
         return intval(round($total_price));
+    }
+
+    private function find_one(Request $request, $order_id) {
+        $order = Order::where('id', $order_id)->first();
+        if(!$order) {
+            return response()->json(
+                [
+                    'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
+                    'message' => 'Đơn hàng này không tìm thấy'
+                ], 400); 
+        }
     }
 }
