@@ -48,17 +48,30 @@ class ProductController extends Controller
     public function find_many(Request $request) {
         $pageIndex = $request->input('pageIndex', 1); 
         $pageSize = $request->input('pageSize', 10);  
+        $q = $request->input('q', null);
+        $type = $request->input('type');
+
         if(!$pageIndex) $pageIndex = 1;
         if(!$pageSize) $pageSize = 10;
         
-        $q = $request->input('q', null);
 
         $query = DB::table('san_pham');
         
         if($q) {
             $query->where('san_pham.ten_san_pham', 'LIKE', '%' . $q . '%');
         }
-        $product_list = $query->select('san_pham.id as id', 'san_pham.ten_san_pham as name', 'san_pham.loai_san_pham as type', 'san_pham.gia_san_pham as price', 'san_pham.thoi_gian_tao as created_at')
+        if($type) {
+            $query->where('san_pham.loai_san_pham', $type);
+        }
+
+        $product_list = $query->select(
+            'san_pham.id as id', 
+            'san_pham.ten_san_pham as name', 
+            'san_pham.hinh_anh_url as image_url', 
+            'san_pham.loai_san_pham as type', 
+            'san_pham.gia_san_pham as price', 
+            'san_pham.thoi_gian_tao as created_at'
+            )
             ->orderBy('san_pham.thoi_gian_tao', 'DESC') 
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
      

@@ -23,7 +23,8 @@ class FileController extends Controller
                 'data' => [
                     "url" => $filePath 
                 ]
-            ]);          } else {
+            ]);          
+        } else {
             return response()->json([
                 'message' => 'Vui lòng thêm file',
                 'data' => null
