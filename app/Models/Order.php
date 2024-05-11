@@ -23,6 +23,7 @@ class Order extends Model
         'created_at',
         'updated_at',
         "table_id",
-        "user_id"
+        "user_id",
+        'tong_gia_san_pham'
     ];
 }

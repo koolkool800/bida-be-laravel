@@ -53,6 +53,7 @@ Route::prefix('v1')->group(function() {
         Route::post('check-in', [OrderController::class, 'check_in']);
         Route::post('check-out', [OrderController::class, 'check_out']);
         Route::post('/{order_id}/products', [OrderController::class, 'add_product_into_order']);
+        Route::get('/{order_id}/total-price', [OrderController::class, 'calc_total_price_by_order_id']);
     });
 
     // PRODUCT

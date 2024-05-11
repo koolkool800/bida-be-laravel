@@ -156,6 +156,8 @@ class OrderController extends Controller
             $insert_order_detail = [];
 
             foreach($products as $product) {
+                $order->tong_gia_san_pham += $product['quantity'] * $product['price'];
+
                 array_push($insert_order_detail, [
                     "so_luong_san_pham" => $product['quantity'],
                     "gia_san_pham" => $product['price'],
@@ -163,6 +165,7 @@ class OrderController extends Controller
                     "san_pham_id" => $product['product_id']
                 ]); 
             }
+            DB::table('orders')->where('id', $order_id)->update(["tong_gia_san_pham" => $order->tong_gia_san_pham]);
             DB::table('don_hang_chi_tiet')->insert($insert_order_detail);
 
             return response()->json([
@@ -177,5 +180,35 @@ class OrderController extends Controller
                 ], 
                 400); 
         }
+    }
+
+    public function calc_total_price_by_order_id(Request $request, $order_id) {
+        $order = Order::where('id', $order_id)->first();
+        if(!$order) {
+            return response()->json(
+                [
+                    'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
+                    'message' => 'Đơn hàng này không tìm thấy'
+                ], 400); 
+        }
+
+        $total_price_by_start_time_and_end_time = $this->calc_total_price_by_start_time_and_end_time($order->current_price, $order->start_time, Carbon::now());
+        $total_price = $total_price_by_start_time_and_end_time + $order->tong_gia_san_pham;
+
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => [
+                "total_price" => $total_price
+            ]
+        ]);
+
+    }
+
+    private function calc_total_price_by_start_time_and_end_time($price, $start_time, $end_time) {
+        $time_diff = $end_time->diff($start_time);
+        $total_hours = $time_diff->days * 24 + $time_diff->h + $time_diff->i / 60 + $time_diff->s / 3600;
+        $total_price = $total_hours * $price;
+
+        return intval(round($total_price));
     }
 }
