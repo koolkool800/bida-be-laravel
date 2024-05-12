@@ -38,6 +38,7 @@ class DashboardController extends Controller
                     DB::raw('SUM(total_price) as total_revenue'),
                     'setting_table.type as setting_table_type'
                 )
+                ->whereNotNull('orders.end_time')
                 ->orderByDesc('total_revenue')
                 ->get();
 

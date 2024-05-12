@@ -149,6 +149,7 @@ class OrderController extends Controller
                 'tables.name as tableName', 
                 'users.name as employeeName'
                 )
+            ->orderBy('orders.created_at', 'DESC')
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
 
         return response()->json(
