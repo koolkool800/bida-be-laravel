@@ -118,6 +118,7 @@ class OrderController extends Controller
     public function find_many(Request $request) {
         $pageIndex = $request->input('pageIndex', 1); 
         $pageSize = $request->input('pageSize', 10); 
+        $q = $request->input('q', null);
         $has_checkout = $request->input('has_checkout', null); 
 
         $query = DB::table('orders');
@@ -129,6 +130,9 @@ class OrderController extends Controller
             } else {
                 $query->whereNull('orders.end_time');
             }
+        }
+        if($q) {
+            $query->where('tables.name', 'LIKE', '%' . $q . '%');
         }
 
         $order_list = $query
