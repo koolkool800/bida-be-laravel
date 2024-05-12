@@ -70,6 +70,7 @@ class OrderController extends Controller
 
     public function check_out(Request $request) {
         $order_id = $request->input('order_id');
+        $customer_name = $request->input('customer_name', null);
         // TODO: validation
 
         $order = Order::where('id', $order_id)->first();
@@ -87,11 +88,11 @@ class OrderController extends Controller
                     'error_code' =>  OrderErrorCode::ORDER_ALREADY_CHECK_OUT, 
                     'message' => 'Order already checkout'
                 ], 400); 
+        }  
+
+        if(!$customer_name) {
+            $customer_name = null;
         }
-       
-        // $time_diff = Carbon::now()->diff($order->start_time);
-        // $total_hours = $time_diff->days * 24 + $time_diff->h + $time_diff->i / 60 + $time_diff->s / 3600;
-        // $total_price = $total_hours * $order->current_price;
 
         $total_price_by_start_time_and_end_time = $this->calc_total_price_by_start_time_and_end_time($order->current_price, $order->start_time, Carbon::now());
         $total_price = $total_price_by_start_time_and_end_time + $order->tong_gia_san_pham;
@@ -99,6 +100,7 @@ class OrderController extends Controller
         $updateOrder = [
             "end_time" => Carbon::now(),
             "total_price" => $total_price,
+            "ten_khach_hang" => $customer_name
         ];
         DB::table('orders')->where('id', $order_id)->update($updateOrder);
 
@@ -262,6 +264,7 @@ class OrderController extends Controller
             "orders.table_id as table_id",
             "orders.user_id as user_id",
             'orders.tong_gia_san_pham as total_product_price',
+            'orders.ten_khach_hang as customer_name',
 
             'tables.name as table_name',
             'setting_table.type as setting_table_type',
@@ -281,11 +284,13 @@ class OrderController extends Controller
             'san_pham.hinh_anh_url as image_url',
             'san_pham.ten_san_pham as product_name',
             'san_pham.loai_san_pham as product_type',
+            'san_pham.id as product_id',
 
             'don_hang_chi_tiet.gia_san_pham as product_price',
             'don_hang_chi_tiet.thoi_gian_tao as created_at',
             'don_hang_chi_tiet.so_luong_san_pham as quantity'
         )
+        ->orderBy('don_hang_chi_tiet.thoi_gian_tao', 'ASC')
         ->get();
 
         $order->order_detail = $order_detail;
@@ -294,6 +299,7 @@ class OrderController extends Controller
             [
                 'message' => 'Successfully',
                 'data' => $order
-            ]);
+            ]
+        );
     }
 }

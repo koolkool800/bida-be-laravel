@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\OrderController;
@@ -68,5 +69,9 @@ Route::prefix('v1')->group(function() {
     // FILE
     ROUTE::prefix('file')->group(function() {
         Route::post('', [FileController::class, 'uploadFile']);
+    });
+
+    ROUTE::prefix('statistical')->group(function() {
+        Route::get('', [DashboardController::class, 'get_statistical']);
     });
 });

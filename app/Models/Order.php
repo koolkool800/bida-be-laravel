@@ -24,6 +24,7 @@ class Order extends Model
         'updated_at',
         "table_id",
         "user_id",
-        'tong_gia_san_pham'
+        'tong_gia_san_pham',
+        'ten_khach_hang'
     ];
 }
