@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function() {
         Route::post('/{order_id}/products', [OrderController::class, 'add_product_into_order']);
         Route::get('/{order_id}/total-price', [OrderController::class, 'calc_total_price_by_order_id']);
         Route::get('/{order_id}', [OrderController::class, 'find_one']);
+        Route::get('/{order_id}/download', [OrderController::class, 'download_invoice']);
     });
 
     // PRODUCT

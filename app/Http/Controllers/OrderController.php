@@ -9,6 +9,7 @@ use App\Models\Table;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -71,6 +72,7 @@ class OrderController extends Controller
     public function check_out(Request $request) {
         $order_id = $request->input('order_id');
         $customer_name = $request->input('customer_name', null);
+        $customer_phone = $request->input('customer_phone', null);
         // TODO: validation
 
         $order = Order::where('id', $order_id)->first();
@@ -100,7 +102,8 @@ class OrderController extends Controller
         $updateOrder = [
             "end_time" => Carbon::now(),
             "total_price" => $total_price,
-            "ten_khach_hang" => $customer_name
+            "ten_khach_hang" => $customer_name,
+            "customer_phone" => $customer_phone,
         ];
         DB::table('orders')->where('id', $order_id)->update($updateOrder);
 
@@ -149,7 +152,8 @@ class OrderController extends Controller
                 "orders.table_id as table_id",
                 "orders.user_id as user_id",
                 'orders.tong_gia_san_pham as total_product_price',
-
+                'orders.ten_khach_hang as customer_name',
+                'orders.customer_phone as customer_phone',
                 'tables.name as tableName', 
                 'users.name as employeeName'
                 )
@@ -270,6 +274,7 @@ class OrderController extends Controller
             "orders.user_id as user_id",
             'orders.tong_gia_san_pham as total_product_price',
             'orders.ten_khach_hang as customer_name',
+            'orders.customer_phone as customer_phone',
 
             'tables.name as table_name',
             'setting_table.type as setting_table_type',
@@ -299,12 +304,71 @@ class OrderController extends Controller
         ->get();
 
         $order->order_detail = $order_detail;
- 
+
         return response()->json(
             [
                 'message' => 'Successfully',
                 'data' => $order
             ]
         );
+    }
+
+    public function download_invoice(Request $request, $order_id) {
+        $order = Order::where('orders.id', $order_id)
+        ->join('tables', 'orders.table_id', '=', 'tables.id')
+        ->join('setting_table', 'tables.setting_table_id', '=', 'setting_table.id')
+        ->select(
+            'orders.id as id',
+            'orders.start_time as start_time',
+            'orders.end_time as end_time',
+            'orders.current_price as current_price',
+            'orders.total_price as total_price',
+            'orders.created_at as created_at',
+            'orders.updated_at as updated_at',
+            "orders.table_id as table_id",
+            "orders.user_id as user_id",
+            'orders.tong_gia_san_pham as total_product_price',
+            'orders.ten_khach_hang as customer_name',
+            'orders.customer_phone as customer_phone',
+
+            'tables.name as table_name',
+            'setting_table.type as setting_table_type',
+        )
+        ->first();
+        
+        if(!$order) {
+            return response()->json(
+                [
+                    'error_code' =>  OrderErrorCode::ORDER_NOT_FOUND, 
+                    'message' => 'Đơn hàng này không tìm thấy'
+                ], 400); 
+        }
+        $order_detail = OrderDetail::where('don_hang_chi_tiet.don_hang_id', $order_id)
+        ->join('san_pham', 'san_pham.id', '=', 'don_hang_chi_tiet.san_pham_id')
+        ->select(
+            'san_pham.hinh_anh_url as image_url',
+            'san_pham.ten_san_pham as product_name',
+            'san_pham.loai_san_pham as product_type',
+            'san_pham.id as product_id',
+
+            'don_hang_chi_tiet.gia_san_pham as product_price',
+            'don_hang_chi_tiet.thoi_gian_tao as created_at',
+            'don_hang_chi_tiet.so_luong_san_pham as quantity'
+        )
+        ->orderBy('don_hang_chi_tiet.thoi_gian_tao', 'ASC')
+        ->get();
+
+        $order->order_detail = $order_detail;
+        // print_r($order);
+        $order->price_table = isset($order->total_price) ? ($order->total_price - $order->total_product_price) : 0;
+
+        $order->start_time = Carbon::parse($order->start_time, 'UTC')->setTimezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i:s');
+        if($order->end_time) {
+            $order->end_time = Carbon::parse($order->end_time, 'UTC')->setTimezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i:s');
+        }
+
+        $pdf = PDF::loadView('invoice', compact('order'));
+        
+        return $pdf->download('invoice.pdf');
     }
 }

@@ -25,6 +25,7 @@ class Order extends Model
         "table_id",
         "user_id",
         'tong_gia_san_pham',
-        'ten_khach_hang'
+        'ten_khach_hang',
+        'customer_phone'
     ];
 }
