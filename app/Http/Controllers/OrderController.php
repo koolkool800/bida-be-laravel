@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Error\OrderErrorCode;
 use App\Enums\Error\TableErrorCode;
 use App\Enums\Error\UserErrorCode;
+use App\Enums\InventoryType;
 use App\Models\Table;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -168,6 +169,7 @@ class OrderController extends Controller
     }
 
     public function add_product_into_order(Request $request, $order_id) {
+        DB::beginTransaction();
         try {
             $products = $request->input('products', null);
             
@@ -195,7 +197,7 @@ class OrderController extends Controller
             }
 
             $insert_order_detail = [];
-
+            $insert_data = [];
             foreach($products as $product) {
                 $order->tong_gia_san_pham += $product['quantity'] * $product['price'];
 
@@ -205,17 +207,40 @@ class OrderController extends Controller
                     "don_hang_id" => $order_id,
                     "san_pham_id" => $product['product_id']
                 ]); 
+
+                array_push($insert_data, [
+                    "quantity" => $product['quantity'],
+                    "product_id" => $product['product_id'],
+                    "date" => Carbon::now()->toDateString(),
+                    "type" => InventoryType::EXPORT
+                ]);  
+                DB::table('san_pham')
+                ->where('id', $product['product_id'])
+                ->update(['quantity' => DB::raw('quantity - ' . $product['quantity'])]);
+                
             }
+ 
+            DB::table('inventory')->insert($insert_data);
+
             DB::table('orders')->where('id', $order_id)->update(["tong_gia_san_pham" => $order->tong_gia_san_pham]);
             DB::table('don_hang_chi_tiet')->insert($insert_order_detail);
 
+            DB::commit();
             return response()->json([
                 'message' => 'Thêm thành công',
                 'data' => 1
             ]);
+
         } catch(QueryException $e) {
-            print_r($e);
-            return response()->json(
+            DB::rollback();
+            if ($e->getCode() === '22003') {
+                return response()->json(
+                    [ 
+                        'message' => 'Vui lòng kiểm tra số lượng sản phẩm'
+                    ], 
+                    400); 
+            }
+            else return response()->json(
                 [ 
                     'message' => 'Vui lòng kiểm tra lại sản phẩm'
                 ], 

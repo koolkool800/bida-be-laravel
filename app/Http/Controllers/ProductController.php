@@ -71,7 +71,8 @@ class ProductController extends Controller
             'san_pham.hinh_anh_url as image_url', 
             'san_pham.loai_san_pham as type', 
             'san_pham.gia_san_pham as price', 
-            'san_pham.thoi_gian_tao as created_at'
+            'san_pham.thoi_gian_tao as created_at',
+            'san_pham.quantity as current_quantity'
             )
             ->orderBy('san_pham.thoi_gian_tao', 'DESC') 
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
@@ -111,11 +112,38 @@ class ProductController extends Controller
                 "date" => Carbon::now()->toDateString(),
                 "type" => InventoryType::IMPORT
             ]);  
+
+            DB::table('san_pham')
+                ->where('id', $product['product_id'])
+                ->update(['quantity' => DB::raw('quantity + ' . $product['quantity'])]);
+
         }
         DB::table('inventory')->insert($insert_data);
         return response()->json([
             'message' => 'Successfully',
             'data' => 1
         ]);
+    }
+
+    public function quantity_statistics_by_id(Request $request, $product_id) {
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        $product = DB::table('san_pham')->select('id', 'hinh_anh_url as image_url', 'ten_san_pham as product_name', 'quantity as current_quantity')->where('id', $product_id)->get();
+        $result = DB::table('inventory')
+            ->select(DB::raw('date, type, product_id, SUM(quantity) as total_quantity'))
+            ->where('product_id', $product_id)
+            ->whereBetween('date', [$start_date, $end_date])
+            ->groupBy('date', 'type', 'product_id')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        return response()->json([
+                'message' => 'Successfully',
+                'data' => [
+                    "product" => $product,
+                    "statistics" => $result
+                ]
+            ]);
     }
 }

@@ -65,6 +65,7 @@ Route::prefix('v1')->group(function() {
         Route::get('', [ProductController::class, 'find_many']);
         Route::post('/imports', [ProductController::class, 'import_product']);
         Route::delete('/{id}', [ProductController::class, 'delete']);
+        Route::get('/{id}/quantity-statistics', [ProductController::class, 'quantity_statistics_by_id']);
         // Route::post('check-out', [OrderController::class, 'check_out']);
     });
 
