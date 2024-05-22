@@ -16,6 +16,8 @@ class EmployeeController extends Controller
         $name = $request->input('name');
         $password = $request->input('password');
         $user_name = $request->input('user_name');
+        $phone = $request->input('phone');
+        $address = $request->input('address');
         // TODO: validating
 
         $is_exist_user_name = User::where('user_name', $user_name)->first();
@@ -31,7 +33,9 @@ class EmployeeController extends Controller
             "name" => $name,
             "password" => Hash::make($password),
             "user_name" => $user_name,
-            "role" => UserRole::STAFF
+            "role" => UserRole::STAFF,
+            "phone" => $phone,
+            "address" => $address
         ];
 
         $new_user = User::create($insertUser);
@@ -48,7 +52,7 @@ class EmployeeController extends Controller
         $pageSize = $request->input('pageSize', 10);  
 
         $user_list = User::where('role', UserRole::STAFF)
-            ->select('id', 'name', 'created_at', 'updated_at', 'user_name')
+            ->select('id', 'name', 'created_at', 'updated_at', 'user_name', 'phone', 'address')
             ->paginate($pageSize, ['*'], 'page', $pageIndex);
  
         return response()->json([
