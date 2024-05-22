@@ -63,6 +63,7 @@ Route::prefix('v1')->group(function() {
     ROUTE::prefix('products')->group(function() {
         Route::post('', [ProductController::class, 'create']);
         Route::get('', [ProductController::class, 'find_many']);
+        Route::post('/imports', [ProductController::class, 'import_product']);
         Route::delete('/{id}', [ProductController::class, 'delete']);
         // Route::post('check-out', [OrderController::class, 'check_out']);
     });

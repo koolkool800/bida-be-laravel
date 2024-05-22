@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Error\ProductErrorCode;
+use App\Enums\InventoryType;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
@@ -92,6 +94,25 @@ class ProductController extends Controller
 
         $product->delete();
         
+        return response()->json([
+            'message' => 'Successfully',
+            'data' => 1
+        ]);
+    }
+
+    public function import_product(Request $request) {
+        $products = $request->input('products');
+
+        $insert_data = [];
+        foreach($products as $product) {
+            array_push($insert_data, [
+                "quantity" => $product['quantity'],
+                "product_id" => $product['product_id'],
+                "date" => Carbon::now()->toDateString(),
+                "type" => InventoryType::IMPORT
+            ]);  
+        }
+        DB::table('inventory')->insert($insert_data);
         return response()->json([
             'message' => 'Successfully',
             'data' => 1
