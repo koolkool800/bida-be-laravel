@@ -138,11 +138,37 @@ class ProductController extends Controller
             ->orderBy('date', 'asc')
             ->get();
 
+        $combinedTransactions = [];
+
+        foreach ($result as $transaction) {
+            $date = $transaction->date;
+            $type = $transaction->type;
+            $quantity = (int) $transaction->total_quantity;
+
+            if (!isset($combinedTransactions[$date])) {
+                $combinedTransactions[$date] = [
+                    'date' => $date,
+                    'total_import_quantity' => 0,
+                    'total_export_quantity' => 0
+                ];
+            }
+
+            // Tính tổng số lượng nhập và xuất tương ứng với từng ngày
+            if ($type === 'IMPORT') {
+                $combinedTransactions[$date]['total_import_quantity'] += $quantity;
+            } elseif ($type === 'EXPORT') {
+                $combinedTransactions[$date]['total_export_quantity'] += $quantity;
+            }
+        }
+
+        $combinedTransactions = array_values($combinedTransactions);
+
+
         return response()->json([
                 'message' => 'Successfully',
                 'data' => [
                     "product" => $product,
-                    "statistics" => $result
+                    "statistics" => $combinedTransactions
                 ]
             ]);
     }
