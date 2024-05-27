@@ -76,5 +76,6 @@ Route::prefix('v1')->group(function() {
 
     ROUTE::prefix('statistical')->group(function() {
         Route::get('', [DashboardController::class, 'get_statistical']);
+        Route::get('revenue', [DashboardController::class, 'get_revenue_statistical']);
     });
 });

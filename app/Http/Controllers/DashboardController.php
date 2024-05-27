@@ -58,4 +58,24 @@ class DashboardController extends Controller
             ]
         );
     }
+
+    public function get_revenue_statistical(Request $request)  {
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        $statistics = DB::table('orders')
+        ->selectRaw('DATE(end_time) as date, SUM(total_price) as total_price_sum, SUM(tong_gia_san_pham) as total_product_price_sum')
+        ->groupBy('date')
+        ->whereNotNull('end_time')
+        ->whereBetween('end_time', [$start_date, $end_date])
+        ->orderBy('date', 'asc')
+        ->get();
+
+        return response()->json(
+            [
+                'message' => 'Successfully',
+                'data' => $statistics
+            ]
+        );
+    }
 }
