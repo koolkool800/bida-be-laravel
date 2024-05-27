@@ -13,6 +13,7 @@ class DashboardController extends Controller
         $total_invoice = DB::table('orders')->whereNotNull('total_price')->count();   
         $total_employee = DB::table('users')->where('role', UserRole::STAFF)->count();
         $total_product = DB::table('san_pham')->count();
+        $total_table = DB::table('tables')->count();
 
         $recent_invoice = DB::table('orders')->whereNotNull('total_price')->select(
             'orders.id as id',
@@ -51,7 +52,8 @@ class DashboardController extends Controller
                     "total_employee" => $total_employee,
                     "total_product" => $total_product,
                     "recent_invoice" => $recent_invoice,
-                    "top_revenue_table" => $top_revenue_table
+                    "top_revenue_table" => $top_revenue_table,
+                    "total_table" => $total_table
                 ]
             ]
         );
